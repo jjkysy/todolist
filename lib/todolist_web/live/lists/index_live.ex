@@ -1,4 +1,4 @@
-defmodule TodolistWeb.TodoListLive do
+defmodule TodolistWeb.Lists.IndexLive do
   use TodolistWeb, :live_view
   alias Todolist.Todos
 

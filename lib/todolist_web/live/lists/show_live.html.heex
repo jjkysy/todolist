@@ -1,18 +1,18 @@
 <div class="space-y-8">
-  <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-semibold text-zinc-800"><%= @list.title %></h1>
-    <.link navigate={~p"/lists"} class="text-blue-600 hover:text-blue-700">
-      Back to Lists
-    </.link>
-  </div>
-
   <div>
-    <form phx-submit="create_item" class="flex gap-4">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-zinc-800"><%= @list.title %></h1>
+      <.link navigate={~p"/lists"} class="text-zinc-600 hover:text-zinc-900">
+        Back to Lists
+      </.link>
+    </div>
+
+    <form phx-submit="create_item" class="mt-4 flex gap-4">
       <.input
         type="text"
         name="content"
         value={@new_item_content}
-        placeholder="Add a new todo item"
+        placeholder="Enter item content"
         phx-debounce="300"
         required
       />
@@ -20,21 +20,22 @@
     </form>
   </div>
 
-  <div class="space-y-2">
+  <div class="space-y-4">
     <%= for item <- @items do %>
       <div class="flex items-center justify-between rounded-lg border border-zinc-200 p-4">
         <div class="flex items-center space-x-4">
-          <.checkbox
-            checked={item.completed}
-            name="completed"
+          <.button
             phx-click="toggle_item"
             phx-value-id={item.id}
-          />
-          <span class={if item.completed, do: "line-through text-zinc-500", else: "text-zinc-800"}>
+            class={"#{if item.completed, do: "bg-green-600 hover:bg-green-700", else: "bg-zinc-600 hover:bg-zinc-700"}"}
+          >
+            <%= if item.completed, do: "Done", else: "Mark Done" %>
+          </.button>
+          <span class={"text-lg #{if item.completed, do: "line-through text-zinc-400", else: "text-zinc-800"}"}>
             <%= item.content %>
           </span>
         </div>
-        
+
         <.button
           phx-click="delete_item"
           phx-value-id={item.id}

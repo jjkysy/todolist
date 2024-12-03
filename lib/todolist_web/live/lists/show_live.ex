@@ -1,4 +1,4 @@
-defmodule TodolistWeb.TodoItemsLive do
+defmodule TodolistWeb.Lists.ShowLive do
   use TodolistWeb, :live_view
   alias Todolist.Todos
 
@@ -29,37 +29,38 @@ defmodule TodolistWeb.TodoItemsLive do
   @impl true
   def handle_event("create_item", %{"content" => content}, socket) do
     if Todos.can_access_list?(socket.assigns.current_user, socket.assigns.list) do
-      case Todos.create_item(%{content: content, list_id: socket.assigns.list.id}) do
+      case Todos.create_item(socket.assigns.list, %{content: content}) do
         {:ok, _item} ->
           items = Todos.list_items(socket.assigns.list)
           {:noreply,
            socket
            |> assign(items: items, new_item_content: "")
-           |> put_flash(:info, "Item added successfully")}
+           |> put_flash(:info, "Item created successfully")}
 
         {:error, %Ecto.Changeset{} = changeset} ->
           {:noreply,
            socket
-           |> put_flash(:error, "Error adding item: #{error_to_string(changeset)}")
+           |> put_flash(:error, "Error creating item: #{error_to_string(changeset)}")
            |> assign(new_item_content: content)}
       end
     else
       {:noreply,
        socket
-       |> put_flash(:error, "You don't have permission to add items to this list")}
+       |> put_flash(:error, "You don't have permission to modify this list")}
     end
   end
 
   @impl true
   def handle_event("toggle_item", %{"id" => id}, socket) do
     item = Todos.get_item!(id)
+
     if Todos.can_access_list?(socket.assigns.current_user, socket.assigns.list) do
-      case Todos.update_item(item, %{completed: !item.completed}) do
+      case Todos.toggle_item(item) do
         {:ok, _item} ->
           items = Todos.list_items(socket.assigns.list)
           {:noreply, assign(socket, items: items)}
 
-        {:error, _changeset} ->
+        {:error, _} ->
           {:noreply,
            socket
            |> put_flash(:error, "Error updating item")}
@@ -67,13 +68,14 @@ defmodule TodolistWeb.TodoItemsLive do
     else
       {:noreply,
        socket
-       |> put_flash(:error, "You don't have permission to update items in this list")}
+       |> put_flash(:error, "You don't have permission to modify this list")}
     end
   end
 
   @impl true
   def handle_event("delete_item", %{"id" => id}, socket) do
     item = Todos.get_item!(id)
+
     if Todos.can_access_list?(socket.assigns.current_user, socket.assigns.list) do
       case Todos.delete_item(item) do
         {:ok, _} ->
@@ -91,7 +93,7 @@ defmodule TodolistWeb.TodoItemsLive do
     else
       {:noreply,
        socket
-       |> put_flash(:error, "You don't have permission to delete items from this list")}
+       |> put_flash(:error, "You don't have permission to modify this list")}
     end
   end
 

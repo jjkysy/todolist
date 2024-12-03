@@ -28,23 +28,23 @@ defmodule TodolistWeb.Router do
   scope "/", TodolistWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
-    get "/register", UserRegistrationController, :new
-    post "/register", UserRegistrationController, :create
-    get "/login", UserSessionController, :new
-    post "/login", UserSessionController, :create
+    get "/users/register", UserRegistrationController, :new
+    post "/users/register", UserRegistrationController, :create
+    get "/users/log_in", UserSessionController, :new
+    post "/users/log_in", UserSessionController, :create
   end
 
   # Protected routes
   scope "/", TodolistWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    live "/lists", TodoListLive
-    live "/lists/:id", TodoItemsLive
+    live "/lists", Lists.IndexLive
+    live "/lists/:id", Lists.ShowLive
   end
 
   scope "/", TodolistWeb do
     pipe_through [:browser]
 
-    delete "/logout", UserSessionController, :delete
+    delete "/users/log_out", UserSessionController, :delete
   end
 end
